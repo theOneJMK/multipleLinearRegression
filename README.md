@@ -7,3 +7,5 @@ Compared to the python library 'stats-models' this library consumes about 10 tim
 I would appreciate any help from an experienced js-developer.
 
 The results of this library are tested against pythons 'stats-models' in order to ensure valid results.
+
+An usage example is shown in the file 'js/mylr.js' or in the 'test/integrationTest.js' file.
