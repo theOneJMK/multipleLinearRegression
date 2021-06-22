@@ -1,5 +1,4 @@
 var math = require('mathjs');
-var jStat = require('jstat');
 var multicollinearity = require('./multicollinearity/multicollinearity.js');
 var autocorrelation = require('./autocorrelation/autocorrelation.js');
 var specification = require('./specification/specification.js');
