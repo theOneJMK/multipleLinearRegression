@@ -13,19 +13,16 @@ let y = [4, 5, 20, 14, 32, 22, 38, 43];
 //add a 1 at beginning of every y for calculating the constant coefficient.
 x = tools.addConstant(x);
 
-//vifs = multicollinearity.varianceInflationFactors(math.matrix(x), true);
-//console.log(`VIFs:\n${vifs}`);
+//calculate variance inflation factors
+vifs = multicollinearity.varianceInflationFactors(math.matrix(x), true);
+console.log(`VIFs:\n${vifs}`);
 
 let regressionResult = linReg.linearRegression(y, x, false);
 
-//autocorrelation.durbinWatson(regressionResult, true);
-//autocorrelation.breuschGodfrey(regressionResult, 3, true);
+autocorrelation.durbinWatson(regressionResult, true);
+autocorrelation.breuschGodfrey(regressionResult, 3, true);
 
-//console.log("\nGoldfeld-Quandt:");
-//homoskedasticty.goldfeldQuandt(y, x, null, null, true);
+console.log("\nGoldfeld-Quandt:");
+homoskedasticty.goldfeldQuandt(y, x, null, null, true);
 
-//specification.ramsey(regressionResult, 4, false)
-
-//TEST
-let lagX = [1,2,3,4,5,6];
-//tools.lagMatrix(lagX, 3, true);
+specification.ramsey(regressionResult, 4, false)
