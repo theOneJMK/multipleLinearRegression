@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "jstat": "^1.9.4",
+    "mathjs": "^9.4.2",
+    "ml-matrix": "^6.8.0"
+  }
+}
