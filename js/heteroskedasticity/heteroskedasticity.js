@@ -1,7 +1,8 @@
-const linReg = require('../linear/linearRegression.js');
-const { isInteger, isPositive } = require('mathjs');
-const { default: Matrix } = require('ml-matrix');
-const jstat = require('jstat');
+import { linearRegression } from '../linear/linearRegression.js';
+import { isInteger, isPositive } from 'mathjs';
+import { Matrix } from 'ml-matrix';
+import jstat from 'jstat';
+const { ftest } = jstat;
 
 class GoldfeldQuandtResult {
 
@@ -83,7 +84,7 @@ function goldfeldQuandt(y, x, sortIndex, split, logging) {
     } else {
         console.log("Splitting in the middle since split is not given.");
     }
-    
+
     let firstSubsetSplitter = splitNumberOfObservations - offset - 1;
     let secondSubsetSplitter = splitNumberOfObservations + offset;
 
@@ -93,8 +94,8 @@ function goldfeldQuandt(y, x, sortIndex, split, logging) {
     let x1 = gqX.subMatrix(0, firstSubsetSplitter, 0, gqX.columns - 1);
     let x2 = gqX.subMatrix(secondSubsetSplitter, gqX.rows - 1, 0, gqX.columns - 1);
 
-    let result1 = linReg.linearRegression(y1, x1, logging);
-    let result2 = linReg.linearRegression(y2, x2, logging);
+    let result1 = linearRegression(y1, x1, logging);
+    let result2 = linearRegression(y2, x2, logging);
 
     if (logging) {
         console.log("1st SSE: " + result1.sse);
@@ -104,8 +105,7 @@ function goldfeldQuandt(y, x, sortIndex, split, logging) {
     let fValDividend = result2.sse / result2.residualDegreesOfFreedom;
     let fValDivisor = result1.sse / result1.residualDegreesOfFreedom;
     let fVal = fValDividend / fValDivisor;
-    let pVal = jstat.ftest(fVal,
-        result1.residualDegreesOfFreedom, result2.residualDegreesOfFreedom);
+    let pVal = ftest(fVal, result1.residualDegreesOfFreedom, result2.residualDegreesOfFreedom);
     if (logging) {
         console.log(`fVal:${fVal}, pval:${pVal}, order:increasing`);
     }
@@ -141,4 +141,4 @@ function sortDesignMatrix(x, y, sortIndex) {
     }
 }
 
-module.exports = { GoldfeldQuandtResult: GoldfeldQuandtResult, goldfeldQuandt: goldfeldQuandt };
+export { GoldfeldQuandtResult, goldfeldQuandt };

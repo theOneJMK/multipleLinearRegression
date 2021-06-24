@@ -1,6 +1,5 @@
-const math = require('mathjs');
-const { isInteger } = require('mathjs');
-const { default: Matrix } = require('ml-matrix');
+import { isInteger , isNegative} from 'mathjs';
+import { Matrix } from 'ml-matrix';
 
 /**
  * Utility function to check wether x is an Array or a Matrix.
@@ -48,7 +47,7 @@ function isConstantPresent(designMatrix) {
     }
     //Transform to Matrix if neccessary
     if (designMatrix instanceof Array) {
-        designMatrix = math.matrix(designMatrix);
+        designMatrix = new Matrix(designMatrix);
     }
 
     let firstColumn = designMatrix.getColumnVector(0);
@@ -68,7 +67,7 @@ function isConstantPresent(designMatrix) {
  * @returns the built lag matrix.
  */
 function lagMatrix(x, nLags, logging) {
-    if (!isInteger(nLags) || math.isNegative(nLags)) {
+    if (!isInteger(nLags) || isNegative(nLags)) {
         throw new Error("nlags needs to be a positive integer to calculate the lagMatrix.");
     }
 
@@ -112,4 +111,4 @@ function degreesOfFreedom(noOfObservations, noOfCoefficients, logging) {
     return degreesOfFreedom;
 }
 
-module.exports = { isArrayOrMatrix: isArrayOrMatrix, degreesOfFreedom: degreesOfFreedom, lagMatrix: lagMatrix, addConstant: addConstant, isConstantPresent: isConstantPresent };
+export { isArrayOrMatrix, degreesOfFreedom, lagMatrix, addConstant, isConstantPresent };

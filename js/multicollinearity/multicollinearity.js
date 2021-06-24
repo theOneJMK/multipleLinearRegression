@@ -1,6 +1,6 @@
-const math = require('mathjs');
-const { default: Matrix } = require('ml-matrix');
-const linReg = require('../linear/linearRegression.js');
+import { range } from 'mathjs';
+import { Matrix } from 'ml-matrix';
+import { linearRegression } from '../linear/linearRegression.js';
 
 class VIFResult {
 
@@ -36,12 +36,12 @@ function varianceInflationFactors(x, logging) {
         case x instanceof Matrix:
             break;
         default:
-            throw new Error("x needs to be math.Matrix or an array");
+            throw new Error("x needs to be Matrix or an array");
     }
 
     let vIFResult = [];
     let noOfColumns = x.columns;
-    let columnIndexes = math.range(0, x.columns).toArray();
+    let columnIndexes = range(0, x.columns).toArray();
     for (let i = 0; i < noOfColumns; i++) {
         let endogenVector = x.getColumnVector(i);
 
@@ -50,8 +50,8 @@ function varianceInflationFactors(x, logging) {
         });
         let exogen = x.subMatrixColumn(indexes, 0, x.rows - 1);
 
-        let rSquared =
-            linReg.linearRegression(endogenVector, exogen).rSquared;
+        let regressionResult = linearRegression(endogenVector, exogen);
+        let rSquared = regressionResult.rSquared;
         let vif = 1 / (1 - rSquared);
 
         if (logging) {
@@ -61,11 +61,11 @@ function varianceInflationFactors(x, logging) {
         let result = new VIFResult();
         result.vif = vif;
         result.rSquared = rSquared;
-        //result.regressionEquation = regressionResult.regressionEquation;
+        result.regressionEquation = regressionResult.regressionEquation;
 
         vIFResult.push(result);
     }
     return vIFResult;
 }
 
-module.exports = { varianceInflationFactors: varianceInflationFactors };
+export { varianceInflationFactors };

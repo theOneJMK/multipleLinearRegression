@@ -1,8 +1,9 @@
-const jstat = require('jstat');
-const linReg = require('../linear/linearRegression.js');
-const { isInteger } = require('mathjs');
-const { LinearResult } = require('../linear/linearResult.js');
-const { default: Matrix } = require('ml-matrix');
+import jstat from 'jstat';
+const { ftest } = jstat;
+import { linearRegression } from '../linear/linearRegression.js';
+import { isInteger } from 'mathjs';
+import { LinearResult } from '../linear/linearResult.js';
+import { Matrix } from 'ml-matrix';
 
 class ResetResult {
     /**
@@ -51,7 +52,7 @@ function ramsey(regressionResult, power, logging) {
         ramseyExogen.addColumn(powerOfFittedValues);
     }
 
-    let ramseyResult = linReg.linearRegression(regressionResult.endogen, ramseyExogen, logging);
+    let ramseyResult = linearRegression(regressionResult.endogen, ramseyExogen, logging);
 
     let dofEn = power - 1;//only the taken powers, so subtract one
     let dofDen = ramseyResult.residualDegreesOfFreedom;
@@ -73,4 +74,4 @@ function ramsey(regressionResult, power, logging) {
     return result;
 }
 
-module.exports = { ramsey: ramsey, ResetResult: ResetResult };
+export { ramsey, ResetResult };

@@ -36,17 +36,17 @@ class LinearResult {
      * Standard error of the coefficients.
      */
     stdErrorOfCoefficients;
-    
+
     /**
      * tValues of the coefficients.
      */
     tValues;
-    
+
     /**
      * p test values of the tValues of the coefficients.
      */
     pValues;
-    
+
     /**
      * The predicted values.
      */
@@ -56,7 +56,7 @@ class LinearResult {
      *  The residuals.
     */
     residuals;
-    
+
     /**
      * Variance of the residuals.
      */
@@ -66,7 +66,7 @@ class LinearResult {
      * R squared. The coefficient of determination.
      */
     rSquared;
-    
+
     /**
      * F-statistic for the regression model.
      */
@@ -115,8 +115,8 @@ class LinearResult {
     /**
      * Empty constructor
      */
-    LinearResult() {    
+    LinearResult() {
     }
 }
 
-module.exports = { LinearResult: LinearResult };
+export { LinearResult };

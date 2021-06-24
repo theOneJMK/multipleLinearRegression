@@ -1,10 +1,10 @@
-const math = require('mathjs');
-const linReg = require('../linear/linearRegression.js');
-const jstat = require('jstat');
-const tools = require('../tools/tools.js');
-const { LinearResult } = require('../linear/linearResult.js');
-const { isInteger, isPositive } = require('mathjs');
-const { default: Matrix } = require('ml-matrix');
+import { linearRegression } from '../linear/linearRegression.js';
+import jstat from 'jstat';
+const { chisquare, ftest } = jstat;
+import { lagMatrix, addConstant } from '../tools/tools.js';
+import { LinearResult } from '../linear/linearResult.js';
+import { square, isInteger, isPositive } from 'mathjs';
+import { Matrix } from 'ml-matrix';
 
 /**
  * Calculate the Durbin-Watson test statistic for firsrt order autocorelation.
@@ -19,7 +19,7 @@ function durbinWatson(regressionResult, logging) {
     let enumerator = 0;
     let residuals = regressionResult.residuals;
     for (let i = 1, len = residuals.length; i < len; i++) {
-        enumerator += math.square(residuals[i] - residuals[i - 1]);
+        enumerator += square(residuals[i] - residuals[i - 1]);
     }
 
     let d = enumerator / regressionResult.sse;
@@ -75,23 +75,23 @@ function breuschGodfrey(regressionResult, nlags, logging) {
         throw new Error("nlags must a positive Integer.");
     }
 
-    let lagMatrix = tools.lagMatrix(regressionResult.residuals, nlags, logging);
+    let lagM = lagMatrix(regressionResult.residuals, nlags, logging);
 
-    lagMatrix = tools.addConstant(lagMatrix);
+    lagM = addConstant(lagM);
 
     let exogen = new Matrix(regressionResult.exogen);
-    for (let i = 0; i < lagMatrix.columns; i++) {
-        exogen.addColumn(lagMatrix.getColumnVector(i));
+    for (let i = 0; i < lagM.columns; i++) {
+        exogen.addColumn(lagM.getColumnVector(i));
     }
 
     if (logging) {
         console.log("Breush-Godfrey exogen: " + exogen);
     }
 
-    let breuschGodfreyRegressionResult = linReg.linearRegression(regressionResult.residuals, exogen, logging);
+    let breuschGodfreyRegressionResult = linearRegression(regressionResult.residuals, exogen, logging);
 
     let lagrangeMultiplier = regressionResult.noOfObservations * breuschGodfreyRegressionResult.rSquared;
-    let lagrangeMultiplierPValue = 1 - jstat.chisquare.cdf(lagrangeMultiplier, nlags);//so called survival function
+    let lagrangeMultiplierPValue = 1 - chisquare.cdf(lagrangeMultiplier, nlags);//so called survival function
 
     let dofEn = nlags;
     let dofDen =
@@ -101,7 +101,7 @@ function breuschGodfrey(regressionResult, nlags, logging) {
     let fTestDenumerator = breuschGodfreyRegressionResult.sse / dofDen;
 
     let fValue = fTestEnumerator / fTestDenumerator;
-    let pValue = jstat.ftest(fValue, dofEn, dofDen);
+    let pValue = ftest(fValue, dofEn, dofDen);
 
     if (logging) {
         console.log(`Breusch-Godfrey, lm: ${lagrangeMultiplier}, lmPVal: ${lagrangeMultiplierPValue}, FValue: ${fValue}, FPValue: ${pValue}`);
@@ -115,4 +115,4 @@ function breuschGodfrey(regressionResult, nlags, logging) {
     return result;
 }
 
-module.exports = { durbinWatson: durbinWatson, BreuschGodfreyResult: BreuschGodfreyResult, breuschGodfrey: breuschGodfrey };
+export { durbinWatson, BreuschGodfreyResult, breuschGodfrey };

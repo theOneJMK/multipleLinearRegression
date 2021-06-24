@@ -1,10 +1,10 @@
 "use strict";
-const math = require('mathjs');
-const jstat = require('jstat');
-const tools = require('../tools/tools.js');
-const { LinearResult } = require('./linearResult.js');
-const { Matrix, pseudoInverse } = require('ml-matrix');
-const { isPositive, setMultiplicity } = require('mathjs');
+import { square, sum, sqrt, mean, isPositive } from 'mathjs';
+import jstat from 'jstat';
+const {ftest, ttest } = jstat;
+import { isConstantPresent, degreesOfFreedom } from '../tools/tools.js';
+import { LinearResult } from './linearResult.js';
+import { Matrix, pseudoInverse } from 'ml-matrix';
 
 /**
  * Performs a linear regression on the observed values y and the variables given in x using the least squares algorythm.
@@ -43,7 +43,7 @@ function linearRegression(y, x, logging) {
     }
 
     let output = new LinearResult();
-    output.constantPresent = tools.isConstantPresent(designMatrix);
+    output.constantPresent = isConstantPresent(designMatrix);
 
     let coefficientResult = calculateCoefficients(designMatrix, yMatrix, logging);
     output.coefficients = coefficientResult.coefficients;
@@ -61,11 +61,11 @@ function linearRegression(y, x, logging) {
     output.sse = rSquared.sse;
     output.mse = rSquared.mse;
 
-    output.residualDegreesOfFreedom = tools.degreesOfFreedom(output.noOfObservations, output.noOfCoefficients, logging);
+    output.residualDegreesOfFreedom = degreesOfFreedom(output.noOfObservations, output.noOfCoefficients, logging);
     output.modelDegreesOfFreedom = output.constantPresent ? output.noOfCoefficients - 1 : output.noOfCoefficients;
 
     output.fValue = fStatistic(output.noOfCoefficients, output.residualDegreesOfFreedom, rSquared.sse, rSquared.sst);
-    output.pValueOfFValue = jstat.ftest(output.fValue, output.modelDegreesOfFreedom, output.residualDegreesOfFreedom);
+    output.pValueOfFValue = ftest(output.fValue, output.modelDegreesOfFreedom, output.residualDegreesOfFreedom);
     if (logging) {
         console.log("\nF-Statistics: " + output.fValue);
     }
@@ -103,26 +103,26 @@ function calculateCoefficients(designMatrix, yMatrix, logging) {
         console.log("transposedDesignMatrix: " + transposedDesignMatrix);
     }
 
-    // let p = transposedDesignMatrix.mmul(designMatrix);
-    // if (logging) {
-    //     console.log("p: " + p);
-    // }
+    let p = transposedDesignMatrix.mmul(designMatrix);
+    if (logging) {
+        console.log("p: " + p);
+    }
 
     let pseudoInv = pseudoInverse(transposedDesignMatrix.mmul(designMatrix));
-    // let q = transposedDesignMatrix.mmul(yMatrix);
+    let q = transposedDesignMatrix.mmul(yMatrix);
 
-    // if (logging) {
-    //     console.log("invP: " + pseudoInv);
-    //     console.log("q: " + q);
-    //}
+    if (logging) {
+        console.log("invP: " + pseudoInv);
+        console.log("q: " + q);
+    }
 
     //Calculate the coefficients b
-    // let regCoeff = pseudoInv.mmul(transposedDesignMatrix.mmul(yMatrix));
-    // if (logging) {
-    //     console.log("\nCoefficients: " + regCoeff);
-    // }
+    let regCoeff = pseudoInv.mmul(q);
+    if (logging) {
+        console.log("\nCoefficients: " + regCoeff);
+    }
     let result = {};
-    result.coefficients = pseudoInv.mmul(transposedDesignMatrix.mmul(yMatrix));;
+    result.coefficients = regCoeff;
     result.pseudoInverse = pseudoInv;
     return result;
 }
@@ -195,9 +195,9 @@ function rSquare(predicted, residuals, yMatrix, noOfObservations, constantPresen
     let squaredErrors = new Array(residuals.length);
     let sse = 0;
     yMatrix.apply((row, column) => {
-        sst += math.square(yMatrix.get(row, column) - meanY);
-        ssr += math.square(predicted[row] - meanY);
-        squaredErrors[row] = math.square(residuals[row]);
+        sst += square(yMatrix.get(row, column) - meanY);
+        ssr += square(predicted[row] - meanY);
+        squaredErrors[row] = square(residuals[row]);
         sse += squaredErrors[row];
     });
 
@@ -208,8 +208,8 @@ function rSquare(predicted, residuals, yMatrix, noOfObservations, constantPresen
         let denumerator = (factor1 * sst);
         rSquared = 1 - (enumerator / denumerator);
     } else {
-        let ySquared = math.square(yMatrix.to1DArray());
-        rSquared = 1 - (sse / math.sum(ySquared));
+        let ySquared = square(yMatrix.to1DArray());
+        rSquared = 1 - (sse / sum(ySquared));
     }
 
     if (logging) {
@@ -217,7 +217,7 @@ function rSquare(predicted, residuals, yMatrix, noOfObservations, constantPresen
     }
 
     let result = {};
-    result.mse = math.mean(squaredErrors);
+    result.mse = mean(squaredErrors);
     result.rSquared = rSquared;
     result.sst = sst; //squared sum of total
     result.ssr = ssr; //squared sum of regression
@@ -268,7 +268,7 @@ function stdErrorOfCoefficients(pseudoInverse, sSquare, logging) {
     let stdErrorOfCoefficients = new Array(diag.length);
     for (let i = 0, len = diag.length; i < len; i++) {
         let x = diag[i] * sSquare;
-        stdErrorOfCoefficients[i] = math.sqrt(x);
+        stdErrorOfCoefficients[i] = sqrt(x);
     }
 
     if (logging) {
@@ -296,7 +296,7 @@ function tValue(coefficients, stdErrorOfCoefficients, residualDegreesOfFreedom, 
     coefficients.apply((row, column) => {
         let tValue = coefficients.get(row, column) / stdErrorOfCoefficients[row];
         tValues[row] = tValue;
-        pValues[row] = jstat.ttest(tValue, residualDegreesOfFreedom);
+        pValues[row] = ttest(tValue, residualDegreesOfFreedom);
     });
 
     if (logging) {
@@ -331,4 +331,4 @@ function buildRegressionEquation(coefficients, constantPresent) {
     return equation;
 }
 
-module.exports = { linearRegression: linearRegression };
+export { linearRegression };

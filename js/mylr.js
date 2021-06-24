@@ -1,10 +1,10 @@
 var math = require('mathjs');
-var multicollinearity = require('./multicollinearity/multicollinearity.js');
-var autocorrelation = require('./autocorrelation/autocorrelation.js');
-var specification = require('./specification/specification.js');
-var homoskedasticty = require('./heteroskedasticy/heteroskedasticy.js');
-var linReg = require('./linear/linearRegression.js');
-var tools = require('./tools/tools.js');
+import { multicollinearity } from './multicollinearity/multicollinearity.js';
+import { autocorrelation } from './autocorrelation/autocorrelation.js';
+import { specification } from './specification/specification.js';
+import { homoskedasticty } from './heteroskedasticy/heteroskedasticy.js';
+import { linReg } from './linear/linearRegression.js';
+import { tools } from './tools/tools.js';
 
 let x = [[0, 1], [5, 1], [15, 2], [25, 5], [35, 11], [45, 15], [55, 34], [60, 35]];
 let y = [4, 5, 20, 14, 32, 22, 38, 43];
