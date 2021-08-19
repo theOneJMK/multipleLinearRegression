@@ -4,6 +4,21 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/theOneJMK/multipleLinearRegression/blob/main/README.md",
   "url": "https://github.com/theOneJMK/multipleLinearRegression/project/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theOneJMK/multipleLinearRegression.git"
+  },
+  "version": "v0.2",
+  "keywords" : [
+    "gihut",
+    "multiple",
+    "linear",
+    "regression",
+    "machine learning",
+    "AI",
+    "artificial intelligence",
+    "theOneJMK"
+  ],
   "dependencies": {
     "convert-csv-to-array": "^1.0.3",
     "jstat": "^1.9.4",
@@ -11,11 +26,15 @@
     "ml-matrix": "^6.8.0",
     "tape": "^5.2.2"
   },
+  "scripts": {
+    "test": "npm test/integrationtest.js"
+  },
   "author": {
     "name": "Julian Kaiser",
     "twitter": "@TheOneJMK"
   },
   "engines": {
-    "node": "at least 15.4.0"
+    "node": ">= 15.4.0",
+    "npm": ">=7.0.15"
   }
 }
